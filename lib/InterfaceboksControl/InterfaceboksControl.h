@@ -20,7 +20,7 @@ class InterfaceboksControl{
 
         void openMainMenu();
         void openSettingsMenu();
-        void openShowerRunning();
+        void openShowerMenu();
         void changeSubMenu();
 
     private:

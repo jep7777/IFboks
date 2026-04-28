@@ -57,7 +57,7 @@ void InterfaceboksControl::handleSelect(){
         case State::MAIN_MENU :
             if(cursorIndex_ == 0){
                 currentState_ = State::SHOWER_RUNNING;
-                openShowerRunning();
+                startShower();
             }
             else{
                 currentState_ = State::SETTINGS;
@@ -69,11 +69,11 @@ void InterfaceboksControl::handleSelect(){
         case State::SETTINGS :
             if(cursorIndex_ == 0){
                 settings_.incTempMaxWater();
-                display_.updateWaterValue(settings_.getTempMaxWater());
+                display_.updateSettingsMenuWater(settings_.getTempMaxWater());
             }
             else if(cursorIndex_ == 1){
                 settings_.incTempMaxEnergy();
-                display_.updateEnergyValue(settings_.getTempMaxEnergy());
+                display_.updateSettingsMenuEnergy(settings_.getTempMaxEnergy());
             }
             else if(cursorIndex_ == 2){
                 currentState_ = State::MAIN_MENU;
@@ -102,11 +102,11 @@ void InterfaceboksControl::handleDecrement(){
         case(State::SETTINGS) :
             if(cursorIndex_ == 0){
                 settings_.decTempMaxWater();
-                display_.updateWaterValue(settings_.getTempMaxWater());
+                display_.updateSettingsMenuWater(settings_.getTempMaxWater());
             }
             else if(cursorIndex_ == 1){
                 settings_.decTempMaxEnergy();
-                display_.updateEnergyValue(settings_.getTempMaxEnergy());
+                display_.updateSettingsMenuEnergy(settings_.getTempMaxEnergy());
             }
             break;
         
@@ -127,13 +127,13 @@ void InterfaceboksControl::openSettingsMenu(){
     display_.displayCursor(cursorIndex_);
 }
 
-void InterfaceboksControl::openShowerRunning(){
+void InterfaceboksControl::startShower(){
     cursorIndex_ = 0;
     subMenuIndex_ = 0;
-    display_.displayShowerRunning(subMenuIndex_);
+    display_.displayShowerMenu(subMenuIndex_);
     display_.displayCursor(cursorIndex_);
 }
 
 void InterfaceboksControl::changeSubMenu(){
-    display_.displayShowerRunning(subMenuIndex_);
+    display_.displayShowerMenu(subMenuIndex_);
 }

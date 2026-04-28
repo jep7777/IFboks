@@ -1,12 +1,12 @@
 #pragma once
 #include <Arduino.h>
 
-
 #define BUTTON1 13
 #define BUTTON2 12
 #define BUTTON3 14
 #define BUTTON4 27
 
+//enum for states
 enum class State {MAIN_MENU, SETTINGS, SHOWER_RUNNING};
 
 //contains button flags, set by ISR's
@@ -17,7 +17,9 @@ void IRAM_ATTR handleButtonPress2();
 void IRAM_ATTR handleButtonPress3();
 void IRAM_ATTR handleButtonPress4();
 
-/* //DET HER VIRKER IKKE, FOR DET ER IKKE PÅLIDELIGT AT TJEKKE FOR FALLING ELLER RISING EDGE MED IF STATMENT
+
+
+/* //DET HER NEDE VIRKER IKKE, FOR DET ER IKKE PÅLIDELIGT AT TJEKKE FOR FALLING ELLER RISING EDGE MED IF STATMENT
 void IRAM_ATTR handleButtonPress1()
 {
     //static makes sure, that it is only initialized to zero on first call

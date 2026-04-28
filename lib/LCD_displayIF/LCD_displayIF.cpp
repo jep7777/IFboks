@@ -47,14 +47,14 @@ void LCD_displayIF::displaySettingsMenu(int maxWater, double maxEnergy){
     lcd_.print("Annuller");
 }
 
-void LCD_displayIF::updateWaterValue(int maxWater){
+void LCD_displayIF::updateSettingsMenuWater(int maxWater){
     lcd_.setCursor(12,0);
     lcd_.print("    "); //to clear the space
     lcd_.setCursor(12,0);
     lcd_.print(maxWater); lcd_.print("L");
 }
 
-void LCD_displayIF::updateEnergyValue(double maxEnergy){
+void LCD_displayIF::updateSettingsMenuEnergy(double maxEnergy){
     lcd_.setCursor(12,1);
     lcd_.print("       "); //to clear the space
     lcd_.setCursor(12,1); 
@@ -93,7 +93,7 @@ void LCD_displayIF::displaySaveMessage(int maxWater, double maxEnergy){
     delay(2000);
 }
 
-void LCD_displayIF::displayShowerRunning(int subMenuIndex){
+void LCD_displayIF::displayShowerMenu(int subMenuIndex){
     lcd_.clear();
     if(subMenuIndex == 0){
         lcd_.setCursor(0,0);

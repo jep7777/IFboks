@@ -9,13 +9,12 @@ class LCD_displayIF {
         void displayMainMenu();
 
         void displaySettingsMenu(int, double);
-        void updateWaterValue(int);
-        void updateEnergyValue(double);
+        void updateSettingsMenuWater(int);
+        void updateSettingsMenuEnergy(double);
         void displayCancelMessage(int, double);
         void displaySaveMessage(int, double);
 
-        //skal ændres senere
-        void displayShowerRunning(int);
+        void displayShowerMenu(int);
 
         void displayCursor(int);
 

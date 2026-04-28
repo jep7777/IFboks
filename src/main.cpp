@@ -4,8 +4,10 @@
 #include "interfaceboksControl.h"
 #include "utility.h"
 
+//Start state in main manu
 State currentState = State::MAIN_MENU;
 
+//initialize objects for the classes
 LCD_displayIF display(Serial2);
 InterfaceboksControl mainControl(display, currentState);
 TrykknapperIF buttons(buttonFlags, mainControl);
