@@ -20,14 +20,17 @@ class InterfaceboksControl{
 
         void openMainMenu();
         void openSettingsMenu();
-        void openShowerMenu();
-        void changeSubMenu();
+        void startShower();
+        void updateShowerScreen() const;
 
     private:
          //returns maximum cursor index based on state
         int maxCursorIndex();
+        int updateSubScreenIndex();
+
         
-        int subMenuIndex_; //to keep track of current submenu
+        int subScreenIndex_; //to keep track of current subscreen during shower
+        int previousSubScreenIndex_; //to check, if subscreen has changed
         int cursorIndex_; //to keep track of cursor position
         LCD_displayIF& display_; 
         State& currentState_;

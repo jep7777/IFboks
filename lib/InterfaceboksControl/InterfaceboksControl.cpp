@@ -3,7 +3,7 @@
 InterfaceboksControl::InterfaceboksControl
     (LCD_displayIF& display, State& currentState) :
             display_(display), currentState_(currentState),
-            settings_(), subMenuIndex_(0), cursorIndex_(0) {}
+            settings_(), subScreenIndex_(0), cursorIndex_(0) {}
 
 
 int InterfaceboksControl::maxCursorIndex(){
@@ -17,21 +17,37 @@ int InterfaceboksControl::maxCursorIndex(){
                 default:
                     throw std::runtime_error("Something went wrong");
             }
+}
 
+int InterfaceboksControl::updateSubScreenIndex(){
+    if(0 <= cursorIndex_ && cursorIndex_ < 4){
+        subScreenIndex_ = 0;
+    }
+    else if(4 <= cursorIndex_ && cursorIndex_ < 8){
+        subScreenIndex_ = 1;
+    }
+    else if(8 <= cursorIndex_ && cursorIndex_ < 12){
+        subScreenIndex_ = 1;
+    }
+    else{
+        throw std::runtime_error("cursorIndex out of bounds");
+    }
 }
 
 void InterfaceboksControl::incCursorIndex(){
     if(cursorIndex_ < maxCursorIndex()){
         cursorIndex_++;
     }
-    //if index goes from 3 to 4, change subMenuIndex
-    if(cursorIndex_ == 4){
-        subMenuIndex_ = 1;
-        changeSubMenu();
+
+    //if state is SHOWER_RUNNING, check if new subscreen should be displayed
+    if(currentState_== State::SHOWER_RUNNING){
+        updateSubScreenIndex();
+        updateShowerScreen();
+    }
+    else{
+        display_.displayCursor(cursorIndex_);
     }
     
-    
-    display_.displayCursor(cursorIndex_);
 }
 
 
@@ -40,14 +56,17 @@ if(cursorIndex_ > 0){
         cursorIndex_--;
     }
 
-    //if index goes from 4 to 3, change subMenuIndex
-    if(cursorIndex_ == 3){
-        subMenuIndex_ = 0;
-        changeSubMenu();
+    //if state is SHOWER_RUNNING, check if new subscreen should be displayed
+    if(currentState_== State::SHOWER_RUNNING){
+        updateSubScreenIndex();
+        updateShowerScreen();
+    }
+    else{
+        display_.displayCursor(cursorIndex_);
     }
     
 
-    display_.displayCursor(cursorIndex_);
+    
 }
 
 
@@ -115,25 +134,44 @@ void InterfaceboksControl::handleDecrement(){
 
 void InterfaceboksControl::openMainMenu(){
     cursorIndex_ = 0;
-    subMenuIndex_ = 0;
+    subScreenIndex_ = 0;
     display_.displayMainMenu();
     display_.displayCursor(cursorIndex_);
 }
 
 void InterfaceboksControl::openSettingsMenu(){
     cursorIndex_ = 0;
-    subMenuIndex_ = 0;
+    subScreenIndex_ = 0;
     display_.displaySettingsMenu(settings_.getMaxWater(), settings_.getMaxEnergy());
     display_.displayCursor(cursorIndex_);
 }
 
 void InterfaceboksControl::startShower(){
     cursorIndex_ = 0;
-    subMenuIndex_ = 0;
-    display_.displayShowerMenu(subMenuIndex_);
+    subScreenIndex_ = 0;
+    display_.displayShowerScreen0(1, 1);
     display_.displayCursor(cursorIndex_);
 }
 
-void InterfaceboksControl::changeSubMenu(){
-    display_.displayShowerMenu(subMenuIndex_);
+void InterfaceboksControl::updateShowerScreen(){
+   if(subScreenIndex_ != previousSubScreenIndex_){
+
+        if(subScreenIndex_ == 0){
+            display_.displayShowerScreen0(1,1);
+        }
+        else if(subScreenIndex_ == 1){
+            display_.displayShowerScreen1(1,1);
+        }
+        else if(subScreenIndex_ == 2){
+            display_.displayShowerScreen2(1,false);
+        }
+        else{
+            throw std::runtime_error("subScreenIndex out of bounds");
+        }
+   }
+
+   display_.displayCursor(cursorIndex_);
+   previousSubScreenIndex_ = subScreenIndex_;
+   
+
 }
