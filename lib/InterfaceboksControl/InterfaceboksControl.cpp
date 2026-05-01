@@ -1,9 +1,10 @@
 #include "interfaceboksControl.h"
 
 InterfaceboksControl::InterfaceboksControl
-    (LCD_displayIF& display, State& currentState) :
+    (LCD_displayIF& display, State& currentState, volatile bool* sendRequestFlag) :
             display_(display), currentState_(currentState),
-            settings_(), subScreenIndex_(0), cursorIndex_(0) {}
+            settings_(), showerValues_(), sendRequestFlag_(sendRequestFlag),
+            subScreenIndex_(0), cursorIndex_(0) {}
 
 
 int InterfaceboksControl::maxCursorIndex(){
@@ -13,13 +14,13 @@ int InterfaceboksControl::maxCursorIndex(){
                 case State::SETTINGS:
                     return 3;
                 case State::SHOWER_RUNNING:
-                    return 7;
+                    return 11;
                 default:
                     throw std::runtime_error("Something went wrong");
             }
 }
 
-int InterfaceboksControl::updateSubScreenIndex(){
+void InterfaceboksControl::updateSubScreenIndex(){
     if(0 <= cursorIndex_ && cursorIndex_ < 4){
         subScreenIndex_ = 0;
     }
@@ -27,7 +28,7 @@ int InterfaceboksControl::updateSubScreenIndex(){
         subScreenIndex_ = 1;
     }
     else if(8 <= cursorIndex_ && cursorIndex_ < 12){
-        subScreenIndex_ = 1;
+        subScreenIndex_ = 2;
     }
     else{
         throw std::runtime_error("cursorIndex out of bounds");
@@ -42,7 +43,7 @@ void InterfaceboksControl::incCursorIndex(){
     //if state is SHOWER_RUNNING, check if new subscreen should be displayed
     if(currentState_== State::SHOWER_RUNNING){
         updateSubScreenIndex();
-        updateShowerScreen();
+        updateSubScreen();
     }
     else{
         display_.displayCursor(cursorIndex_);
@@ -59,7 +60,7 @@ if(cursorIndex_ > 0){
     //if state is SHOWER_RUNNING, check if new subscreen should be displayed
     if(currentState_== State::SHOWER_RUNNING){
         updateSubScreenIndex();
-        updateShowerScreen();
+        updateSubScreen();
     }
     else{
         display_.displayCursor(cursorIndex_);
@@ -149,21 +150,21 @@ void InterfaceboksControl::openSettingsMenu(){
 void InterfaceboksControl::startShower(){
     cursorIndex_ = 0;
     subScreenIndex_ = 0;
-    display_.displayShowerScreen0(1, 1);
+    display_.displayShowerScreen0(1, settings_.getMaxWater(), showerValues_.getLatestTemp());
     display_.displayCursor(cursorIndex_);
 }
 
-void InterfaceboksControl::updateShowerScreen(){
+void InterfaceboksControl::updateSubScreen(){
    if(subScreenIndex_ != previousSubScreenIndex_){
 
         if(subScreenIndex_ == 0){
-            display_.displayShowerScreen0(1,1);
+            display_.displayShowerScreen0(1.1, settings_.getMaxWater(), showerValues_.getLatestTemp());
         }
         else if(subScreenIndex_ == 1){
-            display_.displayShowerScreen1(1,1);
+            display_.displayShowerScreen1(1, settings_.getMaxEnergy());
         }
         else if(subScreenIndex_ == 2){
-            display_.displayShowerScreen2(1,false);
+            display_.displayShowerScreen2(2.47,true);
         }
         else{
             throw std::runtime_error("subScreenIndex out of bounds");
@@ -174,4 +175,17 @@ void InterfaceboksControl::updateShowerScreen(){
    previousSubScreenIndex_ = subScreenIndex_;
    
 
+}
+
+void InterfaceboksControl::checkSendRequestFlag(){
+    noInterrupts();
+    if(*sendRequestFlag_ && !awaitingReadingFlag_){
+        *sendRequestFlag_ = false;
+        display_.test();
+    }
+    interrupts();
+}
+
+void InterfaceboksControl::measurementSequence(){
+    //TODO! lav det her
 }
