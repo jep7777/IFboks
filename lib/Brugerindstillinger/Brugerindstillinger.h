@@ -9,9 +9,11 @@ class Brugerindstillinger{
         void incTempMaxEnergy();
         void decTempMaxEnergy();
 
-
         void resetTempSettings();
         void saveTempSettings();
+
+        bool checkMaxWaterExceeded(double) const;
+        bool checkMaxEnergyExceeded(double) const;
 
         //getters
         double getMaxEnergy() const;

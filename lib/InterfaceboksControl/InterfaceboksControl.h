@@ -4,13 +4,14 @@
 #include "LCD_displayIF.h"
 #include "Brugerindstillinger.h"
 #include "Badanalyse.h"
+#include "BruserboksIF.h"
 #include "utility.h"
 
 class InterfaceboksControl{
 
     public:
 
-        InterfaceboksControl(LCD_displayIF&, State&, volatile bool*);
+        InterfaceboksControl(LCD_displayIF&, State&);
 
         State& currentState_;
 
@@ -26,8 +27,15 @@ class InterfaceboksControl{
         void startShower();
         void updateSubScreen();
 
-        void checkSendRequestFlag();
+       
         void measurementSequence();
+        bool checkReadingValid(const char*);
+        double parseTemperature(const char*);
+        double parseVolume(const char*);
+        double parseFlowRate(const char*);
+        bool checkTempValid(double);
+        bool checkNoFlowTimer(double);        //check if there has been no flow for 60 seconds
+        void updateDisplayValues();
 
     private:
          //returns maximum cursor index based on state
@@ -40,9 +48,6 @@ class InterfaceboksControl{
         LCD_displayIF& display_; 
         Brugerindstillinger settings_;
         Badanalyse showerValues_;
-
-        volatile bool* sendRequestFlag_; //set if new request is to be sent
-        volatile bool* readingReadyFlag_; //set is reading is ready to be read/parsed
-        bool awaitingReadingFlag_; //set while waiting for reading
+        BruserboksIF bruserboksIF_;
 
 };  

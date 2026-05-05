@@ -96,41 +96,50 @@ void LCD_displayIF::displaySaveMessage(int maxWater, double maxEnergy){
     delay(2000);
 }
 
-void LCD_displayIF::displayShowerScreen0(double totalWater, int maxWater, double latestTemp){
+void LCD_displayIF::displayShowerScreen0(double flowRate, double totalWater, int maxWater, double latestTemp){
     lcd_.clear();
     lcd_.setCursor(0,0);
-    lcd_.print("Vandforbrug: "); lcd_.print(totalWater, 1); lcd_.print("L");
+    lcd_.print("Flowrate:  "); lcd_.print(flowRate, 1); lcd_.print("L/m");
 
     lcd_.setCursor(0,1);
-    lcd_.print("Maksimalt: "); lcd_.print(maxWater); lcd_.print("L");
+    lcd_.print("Totalt:    "); lcd_.print(totalWater,1); lcd_.print("L");
 
     lcd_.setCursor(0,2);
-    lcd_.print("Temperatur: "); lcd_.print(latestTemp, 1); lcd_.print("C");
+    lcd_.print("Maksimalt: "); lcd_.print(maxWater);
 
     lcd_.setCursor(0,3);
-    lcd_.print("..................");
+    lcd_.print("Temp.:     "); lcd_.print(latestTemp, 1); 
+    
+    //where ".." is printed depends on size of temp
+    if(latestTemp < 10.0){
+        lcd_.print("C  ..");
+    }
+    else{
+        lcd_.print("C ..");
+    }
+
 }
 
 void LCD_displayIF::displayShowerScreen1(double totalEnergy, double maxEnergy){
     lcd_.clear();
     lcd_.setCursor(0,0);
-    lcd_.print("..................");
+    lcd_.print("                 ..");
 
     lcd_.setCursor(0,1);
     lcd_.print("En.forbrug: "); lcd_.print(totalEnergy, 1); lcd_.print("kWh");
 
     lcd_.setCursor(0,2);
-    lcd_.print("Maksimalt: "); lcd_.print(maxEnergy, 1); lcd_.print("kWh");
+    lcd_.print("Maksimalt:  "); lcd_.print(maxEnergy, 1); lcd_.print("kWh");
 
     lcd_.setCursor(0,3);
-    lcd_.print("..................");
+    lcd_.print("                 ..");
 }
 
 void LCD_displayIF::displayShowerScreen2(double energyPrice, bool isOutdated){
     lcd_.clear();
 
     lcd_.setCursor(0,0);
-    lcd_.print("..................");
+    lcd_.print("                 ..");
 
     lcd_.setCursor(0,1);
     lcd_.print("En.pris: "); lcd_.print(energyPrice, 2); lcd_.print("kr/kWh");
@@ -138,6 +147,32 @@ void LCD_displayIF::displayShowerScreen2(double energyPrice, bool isOutdated){
     if(isOutdated)
     lcd_.setCursor(0,2);
     lcd_.print("(Foraeldet pris)");
+}
+
+void LCD_displayIF::updateShowerScreen0(double flowRate, double totalWater, double temp){
+    lcd_.setCursor(11,0);
+    lcd_.print("        "); //the clear previous value
+    lcd_.setCursor(11,0);
+    lcd_.print(flowRate, 1); lcd_.print("L/m");
+
+    lcd_.setCursor(11,1);
+    lcd_.print("     ");
+    lcd_.setCursor(11,1);
+    lcd_.print(totalWater, 1); lcd_.print("L");
+
+    lcd_.setCursor(11,3);
+    lcd_.print("     ");
+    lcd_.setCursor(11,3);
+    lcd_.print(temp, 1); lcd_.print("C");
+}
+
+void LCD_displayIF::updateShowerScreen1(double totalEnergy){
+    lcd_.setCursor(12,1);
+    lcd_.print("       "); //to clear previous value
+    lcd_.setCursor(12,1);
+    lcd_.print(totalEnergy, 1); lcd_.print("kWh");
+
+   
 }
 
 

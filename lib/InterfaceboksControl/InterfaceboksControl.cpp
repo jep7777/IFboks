@@ -1,9 +1,9 @@
 #include "interfaceboksControl.h"
 
 InterfaceboksControl::InterfaceboksControl
-    (LCD_displayIF& display, State& currentState, volatile bool* sendRequestFlag) :
+    (LCD_displayIF& display, State& currentState) :
             display_(display), currentState_(currentState),
-            settings_(), showerValues_(), sendRequestFlag_(sendRequestFlag),
+            settings_(), showerValues_(),
             subScreenIndex_(0), cursorIndex_(0) {}
 
 
@@ -150,18 +150,22 @@ void InterfaceboksControl::openSettingsMenu(){
 void InterfaceboksControl::startShower(){
     cursorIndex_ = 0;
     subScreenIndex_ = 0;
-    display_.displayShowerScreen0(1, settings_.getMaxWater(), showerValues_.getLatestTemp());
+    bruserboksIF_.emptyHWBuffer();
+    showerValues_.resetValues();
+    display_.displayShowerScreen0(showerValues_.getLatestFlowRate(),
+                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp());
     display_.displayCursor(cursorIndex_);
 }
 
 void InterfaceboksControl::updateSubScreen(){
    if(subScreenIndex_ != previousSubScreenIndex_){
-
+        
         if(subScreenIndex_ == 0){
-            display_.displayShowerScreen0(1.1, settings_.getMaxWater(), showerValues_.getLatestTemp());
+            display_.displayShowerScreen0(showerValues_.getLatestFlowRate(),
+                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp());
         }
         else if(subScreenIndex_ == 1){
-            display_.displayShowerScreen1(1, settings_.getMaxEnergy());
+            display_.displayShowerScreen1(showerValues_.getTotalEnergy(), settings_.getMaxEnergy());
         }
         else if(subScreenIndex_ == 2){
             display_.displayShowerScreen2(2.47,true);
@@ -177,15 +181,110 @@ void InterfaceboksControl::updateSubScreen(){
 
 }
 
-void InterfaceboksControl::checkSendRequestFlag(){
-    noInterrupts();
-    if(*sendRequestFlag_ && !awaitingReadingFlag_){
-        *sendRequestFlag_ = false;
-        display_.test();
+void InterfaceboksControl::measurementSequence(){
+    bruserboksIF_.readToBuffer();
+
+    if(!bruserboksIF_.checkReadingReadyFlag()){
+        return; //if no reading ready, exit function
     }
-    interrupts();
+
+
+    //if reading ready, handle the reading
+    bruserboksIF_.resetReadingReadyFlag();
+    const char* currentReading = bruserboksIF_.getReading(); //pointer to string with readings to be parsed
+    if(!checkReadingValid(currentReading)){
+        return; //if reading not valid, exit function
+    }
+
+    //parse and store temperature
+    double temp = parseTemperature(currentReading);
+    if(!checkTempValid(temp)){
+        //INSERT for showing invalid temp warning
+    }
+    showerValues_.updateLatestTemperature(temp);
+    
+    //parse and store volume and flowrate
+    double volume = parseVolume(currentReading);
+    if(checkNoFlowTimer(volume)){
+        //INSERT code for exiting shower
+    }
+    showerValues_.updateLatestVolume(volume);
+    showerValues_.updateTotalWater();
+    
+    double flowRate = parseFlowRate(currentReading);
+    showerValues_.updateLatestFlowRate(flowRate);
+
+
+    //calculate and update total energy
+    showerValues_.updateTotalEnergy();
+
+
+    //update values on display at the end
+    updateDisplayValues();
 }
 
-void InterfaceboksControl::measurementSequence(){
-    //TODO! lav det her
+
+bool InterfaceboksControl::checkReadingValid(const char* reading){
+    //maybe some checksum here
+    return true;
+}
+
+double InterfaceboksControl::parseTemperature(const char* reading){
+    double flowRate, volume, temp; //sscanf needs pointers to doubles, so double are declared here
+    //sscanf returns number of successfully parsed values.
+    //so success, if it returns three
+    if(sscanf(reading, "F%lf %lf %lf", &flowRate, &volume, &temp) == 3){
+        return temp;
+    }
+    return -1.0; //parse failed
+}
+
+double InterfaceboksControl::parseFlowRate(const char* reading){
+    double flowRate, volume, temp;
+    if(sscanf(reading, "F%lf %lf %lf", &flowRate, &volume, &temp) == 3){
+        return flowRate;
+    }
+    return -1.0; // parse failed
+}
+
+double InterfaceboksControl::parseVolume(const char* reading){
+    double flowRate, volume, temp;
+    if(sscanf(reading, "F%lf %lf %lf", &flowRate, &volume, &temp) == 3){
+        return volume;
+    }
+    return -1.0; // parse failed
+}
+
+bool InterfaceboksControl::checkTempValid(double temp){
+    if(0.0 < temp && temp <=80.0){
+        return true;
+    }
+    return false;
+}
+
+bool InterfaceboksControl::checkNoFlowTimer(double flowRate){
+    unsigned long now = millis();
+    static unsigned long timeAtLastFlow = now;
+
+    if(flowRate == 0.0){
+        return((now - timeAtLastFlow) > 60000); //returns true, if there as been no flow for 60 seconds
+    }
+    else if(flowRate > 0.0){
+        timeAtLastFlow = now;
+        return false;
+    }
+    else{
+            throw std::runtime_error("invalid flowRate values");
+    }
+}
+
+void InterfaceboksControl::updateDisplayValues(){
+    if(subScreenIndex_ == 0){
+        display_.updateShowerScreen0(showerValues_.getLatestFlowRate(),
+             showerValues_.getTotalWater(), showerValues_.getLatestTemp());
+    }
+    else if(subScreenIndex_ == 1){
+        display_.updateShowerScreen1(showerValues_.getTotalEnergy());
+    }
+   
 }

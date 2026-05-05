@@ -41,6 +41,14 @@ void Brugerindstillinger::saveTempSettings(){
     maxWater_ = tempMaxWater_;
 }
 
+bool Brugerindstillinger::checkMaxWaterExceeded(double totalWater) const{
+    return(totalWater > static_cast<double>(maxWater_));
+}
+
+bool Brugerindstillinger::checkMaxEnergyExceeded(double totalEnergy) const{
+    return(totalEnergy > maxEnergy_);
+}
+
 double Brugerindstillinger::getMaxEnergy() const {
     return maxEnergy_;
 }

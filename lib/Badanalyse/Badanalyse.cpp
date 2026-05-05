@@ -15,6 +15,10 @@ void Badanalyse::updateTotalWater(){
     totalWater_ += latestVolume_;
 }
 
+void Badanalyse::updateLatestFlowRate(double newFlowRate){
+    latestFlowRate_ = newFlowRate;
+}
+
 void Badanalyse::updateTotalEnergy(){
     //heat capacity of water is 0.001162 kWh per kg per Kelvin
     //we assume 1 L is 1 kg
@@ -25,13 +29,21 @@ void Badanalyse::updateTotalEnergy(){
     }
 }
 
+void Badanalyse::resetValues(){
+    latestFlowRate_ = 0.0;
+    latestVolume_ = 0.0;
+    totalWater_ = 0.0;
+    latestTemp_ = 0.0;
+    totalEnergy_ = 0.0;
+}
 
 
 double Badanalyse::getLatestTemp() const{
     return latestTemp_;
 }
-
-
+double Badanalyse::getLatestFlowRate() const{
+    return latestFlowRate_;
+}
 double Badanalyse::getTotalWater() const{
     return totalWater_;
 }

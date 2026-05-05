@@ -14,9 +14,11 @@ class LCD_displayIF {
         void displayCancelMessage(int, double);
         void displaySaveMessage(int, double);
 
-        void displayShowerScreen0(double, int, double); //display total flow and max flow
+        void displayShowerScreen0(double, double, int, double); //display flowrate, total water, max water and temp
         void displayShowerScreen1(double, double); //display total energy and max energy
         void displayShowerScreen2(double, bool); //display energy price and status (is it outdated?)
+        void updateShowerScreen0(double, double, double); //update flowrate, total water and temp
+        void updateShowerScreen1(double); //update total energy
 
         void displayCursor(int);
 
