@@ -131,7 +131,7 @@ void LCD_displayIF::displayShowerScreen1(double totalEnergy, double maxEnergy, b
     lcd_.print("                 ..");
 
     lcd_.setCursor(0,1);
-    lcd_.print("En.forbr.:  "); lcd_.print(totalEnergy, 2); lcd_.print("kWh");
+    lcd_.print("En.forbr.: "); lcd_.print(totalEnergy, 2); lcd_.print("kWh");
 
     lcd_.setCursor(0,2);
     if(maxEnergyExceeded){
