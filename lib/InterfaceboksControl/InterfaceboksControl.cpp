@@ -2,9 +2,7 @@
 
 InterfaceboksControl::InterfaceboksControl
     (LCD_displayIF& display, State& currentState) :
-            display_(display), currentState_(currentState),
-            settings_(), showerValues_(),
-            subScreenIndex_(0), cursorIndex_(0) {}
+            display_(display), currentState_(currentState) {}
 
 
 int InterfaceboksControl::maxCursorIndex(){
@@ -153,7 +151,7 @@ void InterfaceboksControl::startShower(){
     bruserboksIF_.emptyHWBuffer();
     showerValues_.resetValues();
     display_.displayShowerScreen0(showerValues_.getLatestFlowRate(),
-                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp());
+                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp(), waterExceededFlag_);
     display_.displayCursor(cursorIndex_);
 }
 
@@ -162,10 +160,10 @@ void InterfaceboksControl::updateSubScreen(){
         
         if(subScreenIndex_ == 0){
             display_.displayShowerScreen0(showerValues_.getLatestFlowRate(),
-                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp());
+                 showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp(), waterExceededFlag_);
         }
         else if(subScreenIndex_ == 1){
-            display_.displayShowerScreen1(showerValues_.getTotalEnergy(), settings_.getMaxEnergy());
+            display_.displayShowerScreen1(showerValues_.getTotalEnergy(), settings_.getMaxEnergy(), energyExceededFlag_);
         }
         else if(subScreenIndex_ == 2){
             display_.displayShowerScreen2(2.47,true);
@@ -214,14 +212,40 @@ void InterfaceboksControl::measurementSequence(){
     double flowRate = parseFlowRate(currentReading);
     showerValues_.updateLatestFlowRate(flowRate);
 
-
     //calculate and update total energy
     showerValues_.updateTotalEnergy();
 
+    //check if max values are exceeded
+    if(!waterExceededFlag_ &&
+            settings_.checkMaxWaterExceeded(showerValues_.getTotalWater()))
+            {
+                setWaterExceededFlag();
+                display_.displayWaterExceededWarning();
+
+                //to get back to showerScreen 0
+                cursorIndex_ = 0;
+                subScreenIndex_ = 0;
+                previousSubScreenIndex_ = 1;
+                updateSubScreen();
+    }
+
+    if(!energyExceededFlag_ &&
+            settings_.checkMaxEnergyExceeded(showerValues_.getTotalEnergy()))
+            {
+                setEnergyExceededFlag();
+                display_.displayEnergyExceededWarning();
+
+                //to get back to showerScreen 1
+                cursorIndex_ = 4;
+                subScreenIndex_ = 1;
+                previousSubScreenIndex_ = 0;
+                updateSubScreen();
+    }
 
     //update values on display at the end
     updateDisplayValues();
 }
+
 
 
 bool InterfaceboksControl::checkReadingValid(const char* reading){
@@ -287,4 +311,17 @@ void InterfaceboksControl::updateDisplayValues(){
         display_.updateShowerScreen1(showerValues_.getTotalEnergy());
     }
    
+}
+
+void InterfaceboksControl::setWaterExceededFlag(){
+    waterExceededFlag_ = true;
+}
+
+void InterfaceboksControl::setEnergyExceededFlag(){
+    energyExceededFlag_ = true;
+}
+
+
+State InterfaceboksControl::getCurrentState() const{
+    return currentState_;
 }

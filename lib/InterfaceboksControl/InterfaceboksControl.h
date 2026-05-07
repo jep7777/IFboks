@@ -13,7 +13,7 @@ class InterfaceboksControl{
 
         InterfaceboksControl(LCD_displayIF&, State&);
 
-        State& currentState_;
+        
 
         //increment/decrement cursorIndex, based on maxCursorIndex
         void incCursorIndex();
@@ -36,17 +36,24 @@ class InterfaceboksControl{
         bool checkTempValid(double);
         bool checkNoFlowTimer(double);        //check if there has been no flow for 60 seconds
         void updateDisplayValues();
+        void setWaterExceededFlag();
+        void setEnergyExceededFlag();
+
+        State getCurrentState() const;
 
     private:
          //returns maximum cursor index based on state
         int maxCursorIndex();
         void updateSubScreenIndex();
 
-        int subScreenIndex_; //to keep track of current subscreen during shower
-        int previousSubScreenIndex_; //to check, if subscreen has changed
-        int cursorIndex_; //to keep track of cursor position
+        int subScreenIndex_{0}; //to keep track of current subscreen during shower
+        int previousSubScreenIndex_{0}; //to check, if subscreen has changed
+        int cursorIndex_{0}; //to keep track of cursor position
+        bool waterExceededFlag_{false}; //is set when total water exceeds maxWater
+        bool energyExceededFlag_{false}; //is set when total energy exceeds maxEnergy
         LCD_displayIF& display_; 
         Brugerindstillinger settings_;
+        State& currentState_;
         Badanalyse showerValues_;
         BruserboksIF bruserboksIF_;
 
