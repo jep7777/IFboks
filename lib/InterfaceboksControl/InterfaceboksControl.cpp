@@ -231,13 +231,16 @@ void InterfaceboksControl::measurementSequence(){
     //parse and store temperature
     double temp = parseTemperature(currentReading);
     if(!checkTempValid(temp)){
-        //INSERT code for showing invalid temp warning
+        display_.displayInvalidTempWarning(temp);
+        exitShower();
+        return; //if temp invalid, exit function
     }
     showerValues_.updateLatestTemperature(temp);
     
     //parse and store volume and flowrate
     double volume = parseVolume(currentReading);
     if(checkNoFlowTimer(volume)){
+        display_.displayNoFlowMessage();
         exitShower();
         return; //if no flow for too long, exit function
     }

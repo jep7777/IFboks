@@ -206,12 +206,33 @@ void LCD_displayIF::displayEnergyExceededWarning(){
     delay(2000);
 }
 
-void LCD_displayIF::displayShowerEnded(double totalWater, double totalEnergy, double totalPrice, bool isOutdated){
+void LCD_displayIF::displayInvalidTempWarning(double temp){
     lcd_.clear();
-    lcd_.print("No flow!");
+    lcd_.setCursor(0,0);
+    lcd_.print("Temp. sensor fejl!");
     lcd_.setCursor(0,1);
-    lcd_.print("Shower ended");
-    delay(3000);
+    lcd_.print("Maalt temp.: "); lcd_.print(temp,1); lcd_.print("C");
+    lcd_.setCursor(0,3);
+    lcd_.print("Bad afsluttes");
+    for(int i = 0; i < 4; i++){ //this just looks fancy on display :D
+        lcd_.print(".");
+        delay(1000);
+    }
+}
+
+void LCD_displayIF::displayNoFlowMessage(){
+    lcd_.clear();
+    lcd_.print("Intet flow!");
+    lcd_.setCursor(0,3);
+    lcd_.print("Bad afsluttes");
+    for(int i = 0; i < 4; i++){ //this just looks fancy on display :D
+        lcd_.print(".");
+        delay(1000);
+    }
+
+}
+
+void LCD_displayIF::displayShowerEnded(double totalWater, double totalEnergy, double totalPrice, bool isOutdated){
 
     lcd_.clear();
     lcd_.setCursor(0,0);

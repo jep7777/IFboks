@@ -27,6 +27,7 @@ class InterfaceboksControl{
         void startShower();
         void updateSubScreen();
         void exitShower();
+        
 
        
         void measurementSequence();
