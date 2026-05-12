@@ -4,16 +4,15 @@ BruserboksIF::BruserboksIF(HardwareSerial& uart1) :
     uart1_(uart1), readingReadyFlag_(false) {}
 
 void BruserboksIF::begin(unsigned long baud){
-    uart1_.begin(baud);
+    uart1_.begin(baud, SERIAL_8N1, 16, 18); //16RX, 18TX
 }
 
 void BruserboksIF::emptyHWBuffer(){
         //code for emptying hardware buffer of pin used to recieve from Mega2560
         
         while(Serial.available() > 0){
-        Serial.read();  // read and discard
-    } 
-    
+            Serial.read();  // read and discard
+        } 
     }
 
 void BruserboksIF::readToBuffer(){

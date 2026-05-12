@@ -30,7 +30,7 @@ TrykknapperIF buttons(buttonFlags, mainControl);
   void setup() {
     Serial.begin(9600); //for testing through USB
     display.begin(9600); //BAUD rate to display is 9600
-    bruserboksIF.begin(9600); //BAUD rate to bruserboksIF is 9600
+    bruserboksIF.begin(9600); //BAUD rate to bruserboksIF is 9600. RX is gpio 16, TX is gpio18
 
     //set internal pullup of button pins
     pinMode(BUTTON1, INPUT_PULLUP);
