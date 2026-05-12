@@ -34,6 +34,13 @@ void InterfaceboksControl::updateSubScreenIndex(){
 }
 
 void InterfaceboksControl::incCursorIndex(){
+    //If shower ended screen is showing, any button goes back to main menu
+    if(currentState_ == State::SHOWER_ENDED){
+        currentState_ = State::MAIN_MENU;
+        openMainMenu();
+        return;
+    }
+
     if(cursorIndex_ < maxCursorIndex()){
         cursorIndex_++;
     }
@@ -51,7 +58,14 @@ void InterfaceboksControl::incCursorIndex(){
 
 
 void InterfaceboksControl::decCursorIndex(){
-if(cursorIndex_ > 0){
+    //If shower ended screen is showing, any button goes back to main menu
+    if(currentState_ == State::SHOWER_ENDED){
+        currentState_ = State::MAIN_MENU;
+        openMainMenu();
+        return;
+    }
+
+    if(cursorIndex_ > 0){
         cursorIndex_--;
     }
 
@@ -107,6 +121,12 @@ void InterfaceboksControl::handleSelect(){
             }
             break;
 
+        case(State::SHOWER_ENDED) :
+            currentState_ = State::MAIN_MENU;
+            openMainMenu();
+            break;
+
+
         default :
         {}
     }
@@ -127,7 +147,14 @@ void InterfaceboksControl::handleDecrement(){
                 display_.updateSettingsMenuEnergy(settings_.getTempMaxEnergy());
             }
             break;
-        
+
+        case(State::SHOWER_ENDED) :
+            currentState_ = State::MAIN_MENU;
+            openMainMenu();
+            break;
+
+        default :
+        {}
     }
 }
 
@@ -148,11 +175,13 @@ void InterfaceboksControl::openSettingsMenu(){
 void InterfaceboksControl::startShower(){
     cursorIndex_ = 0;
     subScreenIndex_ = 0;
-    bruserboksIF_.emptyHWBuffer();
     showerValues_.resetValues();
+    resetExceededFlags();
+    resetTimeAtLastFlow();
     display_.displayShowerScreen0(showerValues_.getLatestFlowRate(),
                  showerValues_.getTotalWater(), settings_.getMaxWater(), showerValues_.getLatestTemp(), waterExceededFlag_);
     display_.displayCursor(cursorIndex_);
+    bruserboksIF_.emptyHWBuffer();
 }
 
 void InterfaceboksControl::updateSubScreen(){
@@ -175,8 +204,13 @@ void InterfaceboksControl::updateSubScreen(){
 
    display_.displayCursor(cursorIndex_);
    previousSubScreenIndex_ = subScreenIndex_;
-   
 
+}
+
+void InterfaceboksControl::exitShower(){
+    currentState_ = State::SHOWER_ENDED;
+    display_.displayShowerEnded(showerValues_.getTotalWater(), showerValues_.getTotalEnergy(), 
+                                    173.2, true);
 }
 
 void InterfaceboksControl::measurementSequence(){
@@ -197,14 +231,15 @@ void InterfaceboksControl::measurementSequence(){
     //parse and store temperature
     double temp = parseTemperature(currentReading);
     if(!checkTempValid(temp)){
-        //INSERT for showing invalid temp warning
+        //INSERT code for showing invalid temp warning
     }
     showerValues_.updateLatestTemperature(temp);
     
     //parse and store volume and flowrate
     double volume = parseVolume(currentReading);
     if(checkNoFlowTimer(volume)){
-        //INSERT code for exiting shower
+        exitShower();
+        return; //if no flow for too long, exit function
     }
     showerValues_.updateLatestVolume(volume);
     showerValues_.updateTotalWater();
@@ -215,7 +250,7 @@ void InterfaceboksControl::measurementSequence(){
     //calculate and update total energy
     showerValues_.updateTotalEnergy();
 
-    //check if max values are exceeded
+    //check if max water is exceeded
     if(!waterExceededFlag_ &&
             settings_.checkMaxWaterExceeded(showerValues_.getTotalWater()))
             {
@@ -229,6 +264,7 @@ void InterfaceboksControl::measurementSequence(){
                 updateSubScreen();
     }
 
+    //check if max energy is exceeded
     if(!energyExceededFlag_ &&
             settings_.checkMaxEnergyExceeded(showerValues_.getTotalEnergy()))
             {
@@ -288,18 +324,21 @@ bool InterfaceboksControl::checkTempValid(double temp){
 
 bool InterfaceboksControl::checkNoFlowTimer(double flowRate){
     unsigned long now = millis();
-    static unsigned long timeAtLastFlow = now;
 
     if(flowRate == 0.0){
-        return((now - timeAtLastFlow) > 60000); //returns true, if there as been no flow for 60 seconds
+        return((now - timeAtLastFlow_) > 6000); //returns true, if there as been no flow for 60 seconds
     }
     else if(flowRate > 0.0){
-        timeAtLastFlow = now;
+        timeAtLastFlow_ = now;
         return false;
     }
     else{
             throw std::runtime_error("invalid flowRate values");
     }
+}
+
+void InterfaceboksControl::resetTimeAtLastFlow(){
+    timeAtLastFlow_ = millis();
 }
 
 void InterfaceboksControl::updateDisplayValues(){
@@ -321,6 +360,10 @@ void InterfaceboksControl::setEnergyExceededFlag(){
     energyExceededFlag_ = true;
 }
 
+void InterfaceboksControl::resetExceededFlags(){
+    waterExceededFlag_ = false;
+    energyExceededFlag_ = false;
+}
 
 State InterfaceboksControl::getCurrentState() const{
     return currentState_;

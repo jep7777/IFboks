@@ -47,7 +47,7 @@ else if(buttons.checkButtonFlag(1<<3)){
   buttons.getControlClass().handleDecrement();
 }
 
-//if state is SHOWER_RUNNING, read to buffer, and check if reading ready
+
 if(mainControl.getCurrentState() == State::SHOWER_RUNNING){
   mainControl.measurementSequence();
 

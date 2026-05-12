@@ -206,3 +206,24 @@ void LCD_displayIF::displayEnergyExceededWarning(){
     delay(2000);
 }
 
+void LCD_displayIF::displayShowerEnded(double totalWater, double totalEnergy, double totalPrice, bool isOutdated){
+    lcd_.clear();
+    lcd_.print("No flow!");
+    lcd_.setCursor(0,1);
+    lcd_.print("Shower ended");
+    delay(3000);
+
+    lcd_.clear();
+    lcd_.setCursor(0,0);
+    lcd_.print("Vandforb.: "); lcd_.print(totalWater,1); lcd_.print("L");
+    lcd_.setCursor(0,1);
+    lcd_.print("En.forb.:  "); lcd_.print(totalEnergy,2); lcd_.print("kWh");
+    lcd_.setCursor(0,2);
+    lcd_.print("Tot. pris: "); lcd_.print(totalPrice,1); lcd_.print("kr.");
+    lcd_.setCursor(0,3);
+    if(isOutdated){
+        lcd_.print("(Gammel energipris)");
+    }
+    
+}
+

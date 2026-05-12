@@ -26,6 +26,7 @@ class InterfaceboksControl{
         void openSettingsMenu();
         void startShower();
         void updateSubScreen();
+        void exitShower();
 
        
         void measurementSequence();
@@ -35,9 +36,11 @@ class InterfaceboksControl{
         double parseFlowRate(const char*);
         bool checkTempValid(double);
         bool checkNoFlowTimer(double);        //check if there has been no flow for 60 seconds
+        void resetTimeAtLastFlow(); //called at start of each shower
         void updateDisplayValues();
         void setWaterExceededFlag();
         void setEnergyExceededFlag();
+        void resetExceededFlags(); //called at start of each shower
 
         State getCurrentState() const;
 
@@ -51,6 +54,7 @@ class InterfaceboksControl{
         int cursorIndex_{0}; //to keep track of cursor position
         bool waterExceededFlag_{false}; //is set when total water exceeds maxWater
         bool energyExceededFlag_{false}; //is set when total energy exceeds maxEnergy
+        unsigned long timeAtLastFlow_{0}; //used to check, if 60 seconds have passed witout flow
         LCD_displayIF& display_; 
         Brugerindstillinger settings_;
         State& currentState_;

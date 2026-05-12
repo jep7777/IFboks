@@ -21,6 +21,7 @@ class LCD_displayIF {
         void updateShowerScreen1(double); //update total energy
         void displayWaterExceededWarning();
         void displayEnergyExceededWarning();
+        void displayShowerEnded(double, double, double, bool);
 
         void displayCursor(int);
 

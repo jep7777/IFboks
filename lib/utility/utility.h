@@ -7,7 +7,7 @@
 #define BUTTON4 27
 
 //enum for states
-enum class State {MAIN_MENU, SETTINGS, SHOWER_RUNNING};
+enum class State {MAIN_MENU, SETTINGS, SHOWER_RUNNING, SHOWER_ENDED};
 
 //contains button flags, set by ISR's
 extern volatile uint8_t buttonFlags;

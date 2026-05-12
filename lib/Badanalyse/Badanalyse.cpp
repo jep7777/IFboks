@@ -51,3 +51,4 @@ double Badanalyse::getTotalWater() const{
 double Badanalyse::getTotalEnergy() const{
     return totalEnergy_;
 }
+
