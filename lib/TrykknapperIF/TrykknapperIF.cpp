@@ -8,11 +8,11 @@ TrykknapperIF::TrykknapperIF(volatile uint8_t& buttonStatus, InterfaceboksContro
 bool TrykknapperIF::checkButtonFlag(uint8_t flagToCheck){
     noInterrupts();
     bool isSet = false;
-    if(buttonFlags & flagToCheck){
+    if(buttonFlags_ & flagToCheck){
         isSet = true;
     }
     //only reset the flag that was checked
-    buttonFlags &= ~flagToCheck;
+    buttonFlags_ &= ~flagToCheck;
     interrupts();
     return isSet;
 }

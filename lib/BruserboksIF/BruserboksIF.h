@@ -3,8 +3,10 @@
 
 class BruserboksIF{
     public:
-
-        BruserboksIF();
+        //constructor is to take Serial1, which is of type HardwareSerial
+        BruserboksIF(HardwareSerial&);
+        //method begin takes BAUD rate
+        void begin(unsigned long);
 
         void emptyHWBuffer();
         void readToBuffer();
@@ -14,7 +16,9 @@ class BruserboksIF{
 
     private:
         char buffer_[32]{};
+        size_t bufferIndex_ = 0;
         bool readingReadyFlag_;
+        HardwareSerial& uart1_;
 
     //for unit test of ESP32
         const char* testData_[10] = {

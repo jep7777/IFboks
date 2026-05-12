@@ -5,15 +5,15 @@
 #include "Brugerindstillinger.h"
 #include "Badanalyse.h"
 #include "BruserboksIF.h"
-#include "utility.h"
+
+//enum for states
+enum class State {MAIN_MENU, SETTINGS, SHOWER_RUNNING, SHOWER_ENDED};
 
 class InterfaceboksControl{
 
     public:
 
-        InterfaceboksControl(LCD_displayIF&, State&);
-
-        
+        InterfaceboksControl(LCD_displayIF&, State&, BruserboksIF&);
 
         //increment/decrement cursorIndex, based on maxCursorIndex
         void incCursorIndex();
@@ -60,6 +60,6 @@ class InterfaceboksControl{
         Brugerindstillinger settings_;
         State& currentState_;
         Badanalyse showerValues_;
-        BruserboksIF bruserboksIF_;
+        BruserboksIF& bruserboksIF_;
 
 };  

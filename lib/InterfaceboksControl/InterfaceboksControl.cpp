@@ -1,8 +1,7 @@
 #include "interfaceboksControl.h"
 
-InterfaceboksControl::InterfaceboksControl
-    (LCD_displayIF& display, State& currentState) :
-            display_(display), currentState_(currentState) {}
+InterfaceboksControl::InterfaceboksControl (LCD_displayIF& display, State& currentState, BruserboksIF& bruserboksIF) :
+            display_(display), currentState_(currentState), bruserboksIF_(bruserboksIF) {}
 
 
 int InterfaceboksControl::maxCursorIndex(){
@@ -223,7 +222,8 @@ void InterfaceboksControl::measurementSequence(){
 
     //if reading ready, handle the reading
     bruserboksIF_.resetReadingReadyFlag();
-    const char* currentReading = bruserboksIF_.getReading(); //pointer to string with readings to be parsed
+    const char* currentReading = bruserboksIF_.getReading(); //returns pointer to string with readings to be parsed
+
     if(!checkReadingValid(currentReading)){
         return; //if reading not valid, exit function
     }

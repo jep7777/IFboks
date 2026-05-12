@@ -1,10 +1,11 @@
 #include "LCD_displayIF.h"
 #include <Arduino.h>
 
-//constructor is to take Serial2, so it uses uart
+ //constructor is to take Serial2, which is of type HardwareSerial
 LCD_displayIF::LCD_displayIF(HardwareSerial& uart) : 
     uart_(uart), lcd_() {}
 
+//method begin takes number, which sets BAUD rate
 void LCD_displayIF::begin(unsigned long baud){
     uart_.begin(baud);
     lcd_.begin(uart_);

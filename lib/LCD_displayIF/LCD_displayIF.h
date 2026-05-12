@@ -3,7 +3,9 @@
 
 class LCD_displayIF {
     public:
+        //constructor is to take Serial2, which is of type HardwareSerial
         LCD_displayIF(HardwareSerial&);
+        //method begin takes number, which sets BAUD rate
         void begin(unsigned long);
 
         void displayMainMenu();
