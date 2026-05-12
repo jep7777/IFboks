@@ -8,6 +8,7 @@ void BruserboksIF::begin(unsigned long baud){
 }
 
 void BruserboksIF::emptyHWBuffer(){
+    
         //code for emptying hardware buffer of pin used to recieve from Mega2560
         
         while(Serial.available() > 0){
@@ -16,7 +17,7 @@ void BruserboksIF::emptyHWBuffer(){
     }
 
 void BruserboksIF::readToBuffer(){
-
+/* 
     //code for reading from HW buffer into buffer.
     while(Serial.available() > 0){
         char c = Serial.read();
@@ -33,9 +34,9 @@ void BruserboksIF::readToBuffer(){
         }
     }
 
-
+  */
     //for testing, read from hardcoded strings
-  /*   unsigned long now = millis(); //get current time
+    unsigned long now = millis(); //get current time
     static unsigned long timeAtLastIndexUpdate = millis();
 
     if((now - timeAtLastIndexUpdate) > 2000){ //check if 2 seconds have passed
@@ -50,7 +51,7 @@ void BruserboksIF::readToBuffer(){
         timeAtLastIndexUpdate = millis();
     }
 
-     */
+     
 
 
 
