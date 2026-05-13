@@ -194,7 +194,7 @@ void InterfaceboksControl::updateSubScreen(){
             display_.displayShowerScreen1(showerValues_.getTotalEnergy(), settings_.getMaxEnergy(), energyExceededFlag_);
         }
         else if(subScreenIndex_ == 2){
-            display_.displayShowerScreen2(2.47,true);
+            display_.displayShowerScreen2(2.47,true); //hardcoded set energy price, hardcoded set bool for "is outdated"
         }
         else{
             throw std::runtime_error("subScreenIndex out of bounds");
@@ -209,7 +209,7 @@ void InterfaceboksControl::updateSubScreen(){
 void InterfaceboksControl::exitShower(){
     currentState_ = State::SHOWER_ENDED;
     display_.displayShowerEnded(showerValues_.getTotalWater(), showerValues_.getTotalEnergy(), 
-                                    173.2, true);
+                                    2.47 * showerValues_.getTotalEnergy(), true); //hardcoded energy price 2.47
 }
 
 void InterfaceboksControl::measurementSequence(){
@@ -288,8 +288,47 @@ void InterfaceboksControl::measurementSequence(){
 
 
 bool InterfaceboksControl::checkReadingValid(const char* reading){
-    //maybe some checksum here
-    return true;
+    // Find colon separator
+    const char* colonPos = strchr(reading, ':');
+    if (!colonPos) {
+        return false;  // no colon found
+    }
+    
+    // Extract data part (before colon) into temporary buffer
+    size_t dataLen = colonPos - reading;
+    char dataPart[50];
+    if (dataLen >= sizeof(dataPart)) {
+        return false;  // data too long
+    }
+    strncpy(dataPart, reading, dataLen); //copy reading into dataPart, but only dataLen number of chars
+    dataPart[dataLen] = '\0';
+    
+    // Calculate checksum of data part
+    unsigned char calculatedChecksum = calculateChecksum(dataPart);
+    
+    // Parse received checksum from hex digits after colon
+    unsigned char receivedChecksum = 0;
+    if (sscanf(colonPos + 1, "%hhx", &receivedChecksum) != 1) {
+        //sscanf reads from colonPos + 1 (starts reading after colon),
+        //the "x" means read hexadecimal numbers, the "hh" means convert into unsigned char
+        //finally, it is written into receivedChecksum
+        return false;  // failed to parse hex
+    }
+    
+    // Compare checksums
+    return (calculatedChecksum == receivedChecksum);
+}
+
+unsigned char InterfaceboksControl::calculateChecksum(const char* dataPart){
+    unsigned char checksum = 0;
+
+	while (*dataPart != '\0')
+	{
+		checksum = checksum ^ *dataPart;
+		dataPart++;
+	}
+
+	return checksum;
 }
 
 double InterfaceboksControl::parseTemperature(const char* reading){
@@ -329,7 +368,7 @@ bool InterfaceboksControl::checkNoFlowTimer(double flowRate){
     unsigned long now = millis();
 
     if(flowRate == 0.0){
-        return((now - timeAtLastFlow_) > 6000); //returns true, if there as been no flow for 60 seconds
+        return((now - timeAtLastFlow_) > 60000); //returns true, if there as been no flow for 60 seconds
     }
     else if(flowRate > 0.0){
         timeAtLastFlow_ = now;

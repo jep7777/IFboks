@@ -15,7 +15,7 @@ class BruserboksIF{
         const char* getReading();
 
     private:
-        char buffer_[32]{};
+        char buffer_[50]{};
         size_t bufferIndex_ = 0;
         bool readingReadyFlag_;
         HardwareSerial& uart1_;

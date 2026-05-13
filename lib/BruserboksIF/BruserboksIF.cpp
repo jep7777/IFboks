@@ -11,19 +11,28 @@ void BruserboksIF::emptyHWBuffer(){
     
         //code for emptying hardware buffer of pin used to recieve from Mega2560
         
+        //for USB testing
         while(Serial.available() > 0){
             Serial.read();  // read and discard
         } 
+
+        
+        //for testing with mega2560
+        while(uart1_.available() > 0){
+            uart1_.read();  // read and discard
+        } 
+
+
     }
 
 void BruserboksIF::readToBuffer(){
-/* 
-    //code for reading from HW buffer into buffer.
-    while(Serial.available() > 0){
-        char c = Serial.read();
 
-        // if next char is '\n', and entire string has been recieved
-        if(c == '\n'){
+    //code for reading from HW buffer into buffer.
+    while(uart1_.available() > 0){
+        char c = uart1_.read();
+
+        // if next char is '\0', an entire string has been recieved
+        if(c == '\0'){
             buffer_[bufferIndex_] = '\0'; //null-terminate
             readingReadyFlag_ = true; //signal that an entire reading is ready
             bufferIndex_ = 0; //reset for next message
@@ -34,7 +43,8 @@ void BruserboksIF::readToBuffer(){
         }
     }
 
-  */
+
+/* 
     //for testing, read from hardcoded strings
     unsigned long now = millis(); //get current time
     static unsigned long timeAtLastIndexUpdate = millis();
@@ -52,7 +62,7 @@ void BruserboksIF::readToBuffer(){
     }
 
      
-
+ */
 
 
 }

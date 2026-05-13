@@ -33,16 +33,16 @@ TrykknapperIF buttons(buttonFlags, mainControl);
     bruserboksIF.begin(9600); //BAUD rate to bruserboksIF is 9600. RX is gpio 16, TX is gpio18
 
     //set internal pullup of button pins
-    pinMode(BUTTON1, INPUT_PULLUP);
-    pinMode(BUTTON2, INPUT_PULLUP);
-    pinMode(BUTTON3, INPUT_PULLUP);
-    pinMode(BUTTON4, INPUT_PULLUP);
+    pinMode(BUTTON1, INPUT);
+    pinMode(BUTTON2, INPUT);
+    pinMode(BUTTON3, INPUT);
+    pinMode(BUTTON4, INPUT);
 
     //attach ISR's to buttons falling edge
-    attachInterrupt(BUTTON1, handleButtonPress1, FALLING);
-    attachInterrupt(BUTTON2, handleButtonPress2, FALLING);
-    attachInterrupt(BUTTON3, handleButtonPress3, FALLING);
-    attachInterrupt(BUTTON4, handleButtonPress4, FALLING);
+    attachInterrupt(BUTTON1, handleButtonPress1, RISING);
+    attachInterrupt(BUTTON2, handleButtonPress2, RISING);
+    attachInterrupt(BUTTON3, handleButtonPress3, RISING);
+    attachInterrupt(BUTTON4, handleButtonPress4, RISING);
 
     //start with opening main menu
     mainControl.openMainMenu();

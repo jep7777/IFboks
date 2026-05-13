@@ -32,6 +32,7 @@ class InterfaceboksControl{
        
         void measurementSequence();
         bool checkReadingValid(const char*);
+        unsigned char calculateChecksum(const char*);
         double parseTemperature(const char*);
         double parseVolume(const char*);
         double parseFlowRate(const char*);
