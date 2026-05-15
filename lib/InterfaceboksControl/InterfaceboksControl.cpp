@@ -295,7 +295,7 @@ bool InterfaceboksControl::checkReadingValid(const char* reading){
     }
     
     // Extract data part (before colon) into temporary buffer
-    size_t dataLen = colonPos - reading;
+    size_t dataLen = colonPos - reading; //only works because the two pointers points to chars in the same string
     char dataPart[50];
     if (dataLen >= sizeof(dataPart)) {
         return false;  // data too long
@@ -368,7 +368,7 @@ bool InterfaceboksControl::checkNoFlowTimer(double flowRate){
     unsigned long now = millis();
 
     if(flowRate == 0.0){
-        return((now - timeAtLastFlow_) > 60000); //returns true, if there as been no flow for 60 seconds
+        return((now - timeAtLastFlow_) > 15000); //returns true, if there as been no flow for 15 seconds (accepttest time)
     }
     else if(flowRate > 0.0){
         timeAtLastFlow_ = now;

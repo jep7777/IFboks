@@ -46,11 +46,12 @@ void BruserboksIF::readToBuffer(){
 
 /* 
     //for testing, read from hardcoded strings
+
     unsigned long now = millis(); //get current time
     static unsigned long timeAtLastIndexUpdate = millis();
 
     if((now - timeAtLastIndexUpdate) > 2000){ //check if 2 seconds have passed
-        strncpy(buffer_, testData_[testIndex_], sizeof(buffer_) - 1); //copy testString into buffer_
+        strncpy(buffer_, testData_[testIndex_], sizeof(buffer_) - 1); //copy testData into buffer_
         buffer_[sizeof(buffer_) - 1] = '\0'; //terminate string
 
         if(testIndex_ < (sizeof(testData_) / sizeof(testData_[0]) - 1)){
